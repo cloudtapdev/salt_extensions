@@ -1348,7 +1348,7 @@ def create_api_integration(restApiId, resourcePath, httpMethod, integrationType,
         if resource:
             requestParameters = dict() if requestParameters is None else requestParameters
             requestTemplates = dict() if requestTemplates is None else requestTemplates
-            cacheKeyParameters = list() if requestTemplates is None else requestTemplates
+            cacheKeyParameters = list() if cacheKeyParameters is None else cacheKeyParameters
             conn = _get_conn(region=region, key=key, keyid=keyid, profile=profile)
             if httpMethod.lower() == 'options':
                 uri = ""
@@ -1357,7 +1357,7 @@ def create_api_integration(restApiId, resourcePath, httpMethod, integrationType,
             integration = conn.put_integration(restApiId=restApiId, resourceId=resource['id'], httpMethod=httpMethod,
                                                type=integrationType, integrationHttpMethod=integrationHttpMethod,
                                                uri=uri, credentials=credentials, requestParameters=requestParameters,
-                                               requestTemplates=requestTemplates, cacheKeyParameters=cacheKeyParameters)
+                                               requestTemplates=requestTemplates, cacheNamespace=resource['id'], cacheKeyParameters=cacheKeyParameters)
             return {'created': True, 'integration': integration}
         return {'created': False, 'error': 'no such resource'}
     except ClientError as e:

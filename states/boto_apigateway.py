@@ -641,8 +641,7 @@ class _Swagger(object):
             '''
             _caching = self._paramdict.get('caching')
             if _caching:
-                if _caching == 'true':
-                    return True
+                return _caching
             return False
 
         @property
