@@ -635,6 +635,17 @@ class _Swagger(object):
             raise ValueError('Unsupported parameter location: {0} in Parameter Object'.format(_location))
 
         @property
+        def caching(self):
+            '''
+            returns if caching is required
+            '''
+            _caching = self._paramdict.get('caching')
+            if _caching:
+                if _caching == 'true':
+                    return True
+            return False
+
+        @property
         def name(self):
             '''
             returns parameter name in the swagger parameter object
@@ -1442,6 +1453,7 @@ class _Swagger(object):
         '''
         method_params = {}
         method_models = {}
+        caching_params = []
         if 'parameters' in method_data:
             for param in method_data['parameters']:
                 p = _Swagger.SwaggerParameter(param)
@@ -1449,6 +1461,8 @@ class _Swagger(object):
                     method_params[p.name] = True
                 if p.schema:
                     method_models['application/json'] = p.schema
+                if p.caching:
+                    caching_params.append(p.name)
 
         if method_name == 'options':
             request_templates = _Swagger.REQUEST_OPTION_TEMPLATE
@@ -1461,7 +1475,8 @@ class _Swagger(object):
         return {'params': method_params,
                 'models': method_models,
                 'request_templates': request_templates,
-                'integration_type': integration_type}
+                'integration_type': integration_type,
+                'caching_keys': caching_params}
 
     def _find_patterns(self, o):
         result = []
@@ -1602,6 +1617,7 @@ class _Swagger(object):
                                                                uri=lambda_uri,
                                                                credentials=lambda_integration_role,
                                                                requestTemplates=method.get('request_templates'),
+                                                               cacheKeyParameters=method.get('caching_keys'),
                                                                **self._common_aws_args))
         if not integration.get('created'):
             ret = _log_error_and_abort(ret, integration)
